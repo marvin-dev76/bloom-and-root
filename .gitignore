@@ -1,25 +1,20 @@
-## Ignorar archivos de Build de .NET
 bin/
 obj/
 out/
 
-## Archivos de usuario de Visual Studio
 *.suo
 *.user
 *.userosscache
 *.sln.docstates
 *.userprefs
 
-## Carpetas de Visual Studio
 .vs/
 .vscode/
 
-## Archivos de configuración local
 appsettings.Development.json
 appsettings.Local.json
 *.local.json
 
-## Archivos sensibles
 .env
 *.key
 *.pfx
@@ -27,7 +22,6 @@ appsettings.Local.json
 secrets.json
 launchSettings.json
 
-## Paquetes NuGet (se restauran automáticamente)
 *.nupkg
 *.snupkg
 packages/
@@ -35,28 +29,23 @@ project.lock.json
 project.fragment.lock.json
 artifacts/
 
-## Archivos de prueba
 TestResults/
 *.trx
 *.coverage
 *.coveragexml
 
-## Archivos de sistema
 .DS_Store
 Thumbs.db
 Desktop.ini
 
-## Logs
 *.log
 logs/
 
-## Carpetas de publicación
 publish/
 PublishProfiles/
 *.pubxml
 *.publishsettings
 
-## Archivos temporales
 *.tmp
 *.temp
 *~
