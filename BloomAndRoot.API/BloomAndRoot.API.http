@@ -1,0 +1,6 @@
+@BloomAndRoot.API_HostAddress = http://localhost:5038
+
+GET {{BloomAndRoot.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
