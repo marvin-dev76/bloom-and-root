@@ -1,4 +1,6 @@
+using BloomAndRoot.API.Middleware;
 using BloomAndRoot.Application.Features.Plants.Commands.AddPlant;
+using BloomAndRoot.Application.Features.Plants.Commands.UpdatePlant;
 using BloomAndRoot.Application.Features.Plants.Queries.GetAllPlants;
 using BloomAndRoot.Application.Features.Plants.Queries.GetPlantById;
 using BloomAndRoot.Application.Interfaces;
@@ -21,10 +23,15 @@ builder.Services.AddScoped<IPlantRepository, PlantRepository>();
 builder.Services.AddScoped<GetAllPlantsQueryHandler>();
 builder.Services.AddScoped<GetPlantByIdQueryHandler>();
 builder.Services.AddScoped<AddPlantCommandHandler>();
-builder.Services.AddControllers();
+builder.Services.AddScoped<UpdatePlantCommandHandler>();
+builder.Services.AddControllers().AddJsonOptions((options) =>
+{
+  options.JsonSerializerOptions.NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.Strict;
+});
 
 var app = builder.Build();
 
+app.UseMiddleware<GlobalExceptionMiddleware>();
 app.UseHttpsRedirection();
 app.MapControllers();
 

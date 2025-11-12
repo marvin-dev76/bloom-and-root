@@ -1,4 +1,5 @@
 using BloomAndRoot.Application.DTOs;
+using BloomAndRoot.Application.Exceptions;
 using BloomAndRoot.Application.Interfaces;
 using BloomAndRoot.Application.Mappers;
 
@@ -10,23 +11,30 @@ namespace BloomAndRoot.Application.Features.Plants.Commands.UpdatePlant
 
     public async Task<PlantDTO> Handle(UpdatePlantCommand command)
     {
-      var plant = await _plantRepository.GetByIdAsync(command.Id) ?? throw new KeyNotFoundException($"Plant with Id: {command.Id} does not exist");
+      try
+      {
+        var plant = await _plantRepository.GetByIdAsync(command.Id) ?? throw new NotFoundException($"Plant with Id: {command.Id} does not exist");
 
-      if (command.Name != null)
-        plant.UpdateName(command.Name);
+        if (command.Name != null)
+          plant.UpdateName(command.Name);
 
-      if (command.Description != null)
-        plant.UpdateDescription(command.Description);
+        if (command.Description != null)
+          plant.UpdateDescription(command.Description);
 
-      if (command.Price.HasValue)
-        plant.UpdatePrice(command.Price.Value);
+        if (command.Price.HasValue)
+          plant.UpdatePrice(command.Price.Value);
 
-      if (command.Stock.HasValue)
-        plant.UpdateStock(command.Stock.Value);
+        if (command.Stock.HasValue)
+          plant.UpdateStock(command.Stock.Value);
 
-      _plantRepository.Update(plant);
-      await _plantRepository.SaveChangesAsync();
-      return plant.ToDTO();
+        _plantRepository.Update(plant);
+        await _plantRepository.SaveChangesAsync();
+        return plant.ToDTO();
+      }
+      catch (ArgumentException ex)
+      {
+        throw new ValidationException(ex.Message);
+      }
     }
   }
 }

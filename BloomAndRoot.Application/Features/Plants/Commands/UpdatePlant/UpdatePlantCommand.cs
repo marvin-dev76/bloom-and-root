@@ -1,6 +1,6 @@
 namespace BloomAndRoot.Application.Features.Plants.Commands.UpdatePlant
 {
-  public class UpdatePlantCommand(int id, string name, string description, decimal price, int stock)
+  public class UpdatePlantCommand(int id, string? name, string? description, decimal? price, int? stock)
   {
     public int Id { get; set; } = id;
     public string? Name { get; set; } = name;
