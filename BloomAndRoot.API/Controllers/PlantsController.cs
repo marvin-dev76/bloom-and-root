@@ -1,14 +1,17 @@
 using BloomAndRoot.Application.Features.Plants.Queries.GetAllPlants;
+using BloomAndRoot.Application.Features.Plants.Queries.GetPlantById;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BloomAndRoot.API.Controllers
 {
   [ApiController]
   [Route("/api/plants")]
-  public class PlantsController(GetAllPlantsQueryHandler getAllPlantsQueryHandler) : ControllerBase
+  public class PlantsController(GetAllPlantsQueryHandler getAllPlantsQueryHandler, GetPlantByIdQueryHandler getPlantByIdQueryHandler) : ControllerBase
   {
     private readonly GetAllPlantsQueryHandler _getAllPlantsQueryHandler = getAllPlantsQueryHandler;
+    private readonly GetPlantByIdQueryHandler _getPlantByIdQueryHandler = getPlantByIdQueryHandler;
 
+    // get all plants endpoint
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
@@ -17,6 +20,26 @@ namespace BloomAndRoot.API.Controllers
         var query = new GetAllPlantsQuery();
         var result = await _getAllPlantsQueryHandler.Handle(query);
         return Ok(result);
+      }
+      catch (Exception)
+      {
+        return StatusCode(500, new { error = "Internal Server Error" });
+      }
+    }
+
+    // get plant by Id enpoint
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetById(int id)
+    {
+      try
+      {
+        var query = new GetPlantByIdQuery(id);
+        var result = await _getPlantByIdQueryHandler.Handle(query);
+        return Ok(result);
+      }
+      catch (KeyNotFoundException ex)
+      {
+        return NotFound(ex.Message);
       }
       catch (Exception)
       {

@@ -10,8 +10,8 @@ namespace BloomAndRoot.Application.Features.Plants.Queries.GetPlantById
 
     public async Task<PlantDTO?> Handle(GetPlantByIdQuery query)
     {
-      var plant = await _plantRepository.GetByIdAsync(query.Id);
-      return plant?.ToDTO();
+      var plant = await _plantRepository.GetByIdAsync(query.Id) ?? throw new KeyNotFoundException($"Plant with Id: {query.Id} does not exist");
+      return plant.ToDTO();
     }
   }
 }
