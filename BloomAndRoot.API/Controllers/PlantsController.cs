@@ -1,3 +1,5 @@
+using BloomAndRoot.Application.DTOs;
+using BloomAndRoot.Application.Features.Plants.Commands.AddPlant;
 using BloomAndRoot.Application.Features.Plants.Queries.GetAllPlants;
 using BloomAndRoot.Application.Features.Plants.Queries.GetPlantById;
 using Microsoft.AspNetCore.Mvc;
@@ -6,10 +8,12 @@ namespace BloomAndRoot.API.Controllers
 {
   [ApiController]
   [Route("/api/plants")]
-  public class PlantsController(GetAllPlantsQueryHandler getAllPlantsQueryHandler, GetPlantByIdQueryHandler getPlantByIdQueryHandler) : ControllerBase
+  public class PlantsController(
+    GetAllPlantsQueryHandler getAllPlantsQueryHandler, GetPlantByIdQueryHandler getPlantByIdQueryHandler, AddPlantCommandHandler addPlantCommandHandler) : ControllerBase
   {
     private readonly GetAllPlantsQueryHandler _getAllPlantsQueryHandler = getAllPlantsQueryHandler;
     private readonly GetPlantByIdQueryHandler _getPlantByIdQueryHandler = getPlantByIdQueryHandler;
+    private readonly AddPlantCommandHandler _addPlantCommandHandler = addPlantCommandHandler;
 
     // get all plants endpoint
     [HttpGet]
@@ -40,6 +44,21 @@ namespace BloomAndRoot.API.Controllers
       catch (KeyNotFoundException ex)
       {
         return NotFound(ex.Message);
+      }
+      catch (Exception)
+      {
+        return StatusCode(500, new { error = "Internal Server Error" });
+      }
+    }
+
+    // post plant endpoint
+    public async Task<IActionResult> Add([FromBody] AddPlantDTO dto)
+    {
+      try
+      {
+        var command = new AddPlantCommand(dto.Name, dto.Description, dto.Price, dto.Stock);
+        var result = await _addPlantCommandHandler.Handle(command);
+        return Ok(result);
       }
       catch (Exception)
       {

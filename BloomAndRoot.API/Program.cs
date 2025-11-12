@@ -1,3 +1,4 @@
+using BloomAndRoot.Application.Features.Plants.Commands.AddPlant;
 using BloomAndRoot.Application.Features.Plants.Queries.GetAllPlants;
 using BloomAndRoot.Application.Features.Plants.Queries.GetPlantById;
 using BloomAndRoot.Application.Interfaces;
@@ -19,6 +20,7 @@ builder.Services.AddDbContext<AppDbContext>((options) =>
 builder.Services.AddScoped<IPlantRepository, PlantRepository>();
 builder.Services.AddScoped<GetAllPlantsQueryHandler>();
 builder.Services.AddScoped<GetPlantByIdQueryHandler>();
+builder.Services.AddScoped<AddPlantCommandHandler>();
 builder.Services.AddControllers();
 
 var app = builder.Build();
