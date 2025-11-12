@@ -23,7 +23,6 @@ namespace BloomAndRoot.Application.Features.Plants.Commands.AddPlant
       {
         throw new ValidationException(ex.Message);
       }
-
     }
   }
 }

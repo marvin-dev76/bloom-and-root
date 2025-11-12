@@ -1,5 +1,6 @@
 using BloomAndRoot.Application.DTOs;
 using BloomAndRoot.Application.Features.Plants.Commands.AddPlant;
+using BloomAndRoot.Application.Features.Plants.Commands.DeletePlant;
 using BloomAndRoot.Application.Features.Plants.Commands.UpdatePlant;
 using BloomAndRoot.Application.Features.Plants.Queries.GetAllPlants;
 using BloomAndRoot.Application.Features.Plants.Queries.GetPlantById;
@@ -10,12 +11,13 @@ namespace BloomAndRoot.API.Controllers
   [ApiController]
   [Route("/api/plants")]
   public class PlantsController(
-    GetAllPlantsQueryHandler getAllPlantsQueryHandler, GetPlantByIdQueryHandler getPlantByIdQueryHandler, AddPlantCommandHandler addPlantCommandHandler, UpdatePlantCommandHandler updatePlantCommandHandler) : ControllerBase
+    GetAllPlantsQueryHandler getAllPlantsQueryHandler, GetPlantByIdQueryHandler getPlantByIdQueryHandler, AddPlantCommandHandler addPlantCommandHandler, UpdatePlantCommandHandler updatePlantCommandHandler, DeletePlantCommandHandler deletePlantCommandHandler) : ControllerBase
   {
     private readonly GetAllPlantsQueryHandler _getAllPlantsQueryHandler = getAllPlantsQueryHandler;
     private readonly GetPlantByIdQueryHandler _getPlantByIdQueryHandler = getPlantByIdQueryHandler;
     private readonly AddPlantCommandHandler _addPlantCommandHandler = addPlantCommandHandler;
     private readonly UpdatePlantCommandHandler _updatePlantCommandHandler = updatePlantCommandHandler;
+    private readonly DeletePlantCommandHandler _deletePlantCommandHandler = deletePlantCommandHandler;
 
     // get all plants endpoint
     [HttpGet]
@@ -50,6 +52,15 @@ namespace BloomAndRoot.API.Controllers
       var command = new UpdatePlantCommand(id, dto.Name, dto.Description, dto.Price, dto.Stock);
       var result = await _updatePlantCommandHandler.Handle(command);
       return Ok(result);
+    }
+
+    // delete plant endpoint
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+      var command = new DeletePlantCommand(id);
+      await _deletePlantCommandHandler.Handle(command);
+      return NoContent();
     }
   }
 }

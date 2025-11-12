@@ -1,3 +1,4 @@
+using BloomAndRoot.Application.Exceptions;
 using BloomAndRoot.Application.Interfaces;
 
 namespace BloomAndRoot.Application.Features.Plants.Commands.DeletePlant
@@ -8,7 +9,7 @@ namespace BloomAndRoot.Application.Features.Plants.Commands.DeletePlant
 
     public async Task Handle(DeletePlantCommand command)
     {
-      var plant = await _plantRepository.GetByIdAsync(command.Id) ?? throw new KeyNotFoundException($"Plant with Id: {command.Id} does not exist");
+      var plant = await _plantRepository.GetByIdAsync(command.Id) ?? throw new NotFoundException($"Plant with Id: {command.Id} does not exist");
       _plantRepository.Delete(plant);
       await _plantRepository.SaveChangesAsync();
     }
