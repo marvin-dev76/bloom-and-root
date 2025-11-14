@@ -10,7 +10,7 @@ namespace BloomAndRoot.Application.Features.Plants.Queries.GetAllPlants
 
     public async Task<IEnumerable<PlantDTO>> Handle(GetAllPlantsQuery query)
     {
-      var plants = await _plantRepository.GetAllAsync();
+      var plants = await _plantRepository.GetAllAsync(query.Search);
       return plants.Select((p) => p.ToDTO());
     }
   }

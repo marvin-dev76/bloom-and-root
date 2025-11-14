@@ -5,7 +5,7 @@ namespace BloomAndRoot.Application.Interfaces
   public interface IPlantRepository
   {
     // queries
-    Task<IEnumerable<Plant>> GetAllAsync();
+    Task<IEnumerable<Plant>> GetAllAsync(string? search = null);
     Task<Plant?> GetByIdAsync(int id);
 
     // commands
