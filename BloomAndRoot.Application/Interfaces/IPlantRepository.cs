@@ -1,3 +1,4 @@
+using BloomAndRoot.Application.Common;
 using BloomAndRoot.Domain.Entities;
 
 namespace BloomAndRoot.Application.Interfaces
@@ -6,6 +7,7 @@ namespace BloomAndRoot.Application.Interfaces
   {
     // queries
     Task<(IEnumerable<Plant> plants, int totalCount)> GetAllAsync(
+      SortParams sortParams,
       string? search = null,
       decimal? minPrice = null,
       decimal? maxPrice = null,

@@ -1,3 +1,4 @@
+using BloomAndRoot.Application.Common;
 using BloomAndRoot.Application.Interfaces;
 using BloomAndRoot.Domain.Entities;
 using BloomAndRoot.Infrastructure.Data;
@@ -10,6 +11,7 @@ namespace BloomAndRoot.Infrastructure.Repositories
     private readonly AppDbContext _appDbContext = appDbContext;
 
     public async Task<(IEnumerable<Plant> plants, int totalCount)> GetAllAsync(
+      SortParams sortParams,
       string? search = null,
       decimal? minPrice = null,
       decimal? maxPrice = null,
@@ -33,10 +35,22 @@ namespace BloomAndRoot.Infrastructure.Repositories
         query = query.Where((p) => p.Price <= maxPrice.Value);
       }
 
+      query = sortParams.SortBy switch
+      {
+        PlantSortBy.Name => sortParams.SortOrder == SortOrder.Asc
+          ? query.OrderBy((p) => p.Name)
+          : query.OrderByDescending((p) => p.Name),
+
+        PlantSortBy.Price => sortParams.SortOrder == SortOrder.Asc
+          ? query.OrderBy((p) => p.Price)
+          : query.OrderByDescending((p) => p.Price),
+
+        _ => query.OrderBy((p) => p.Name)
+      };
+
       var totalCount = await query.CountAsync();
 
       var plants = await query
-        .OrderBy((p) => p.Name)
         .Skip((page - 1) * pageSize)
         .Take(pageSize)
         .ToListAsync();
