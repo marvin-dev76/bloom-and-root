@@ -1,3 +1,4 @@
+using BloomAndRoot.Application.Common;
 using BloomAndRoot.Application.DTOs;
 using BloomAndRoot.Application.Interfaces;
 using BloomAndRoot.Application.Mappers;
@@ -8,10 +9,16 @@ namespace BloomAndRoot.Application.Features.Plants.Queries.GetAllPlants
   {
     private readonly IPlantRepository _plantRepository = plantRepository;
 
-    public async Task<IEnumerable<PlantDTO>> Handle(GetAllPlantsQuery query)
+    public async Task<PagedResult<PlantDTO>> Handle(GetAllPlantsQuery query)
     {
-      var plants = await _plantRepository.GetAllAsync(query.Search);
-      return plants.Select((p) => p.ToDTO());
+      var (plants, totalCount) = await _plantRepository.GetAllAsync(query.Search, query.Page, query.PageSize);
+      return new PagedResult<PlantDTO>
+      {
+        Items = plants.Select((p) => p.ToDTO()),
+        TotalCount = totalCount,
+        Page = query.Page,
+        PageSize = query.PageSize
+      };
     }
   }
 }

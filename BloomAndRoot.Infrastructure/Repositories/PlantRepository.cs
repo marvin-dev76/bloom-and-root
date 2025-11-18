@@ -9,14 +9,23 @@ namespace BloomAndRoot.Infrastructure.Repositories
   {
     private readonly AppDbContext _appDbContext = appDbContext;
 
-    public async Task<IEnumerable<Plant>> GetAllAsync(string? search = null)
+    public async Task<(IEnumerable<Plant> plants, int totalCount)> GetAllAsync(string? search = null, int page = 1, int pageSize = 15)
     {
       var query = _appDbContext.Plants.AsQueryable();
+
       if (!string.IsNullOrWhiteSpace(search))
       {
         query = query.Where((p) => p.Name.Contains(search));
       }
-      return await query.ToListAsync();
+
+      var totalCount = await query.CountAsync();
+
+      var plants = await query
+        .Skip((page - 1) * pageSize)
+        .Take(pageSize)
+        .ToListAsync();
+
+      return (plants, totalCount);
     }
 
     public async Task<Plant?> GetByIdAsync(int id)

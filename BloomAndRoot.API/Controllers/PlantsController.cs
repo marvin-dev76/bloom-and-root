@@ -21,9 +21,9 @@ namespace BloomAndRoot.API.Controllers
 
     // get all plants endpoint
     [HttpGet]
-    public async Task<IActionResult> GetAll([FromQuery] string? search)
+    public async Task<IActionResult> GetAll([FromQuery] string? search, [FromQuery] int page = 1, [FromQuery] int pageSize = 15)
     {
-      var query = new GetAllPlantsQuery(search);
+      var query = new GetAllPlantsQuery(search, page, pageSize);
       var result = await _getAllPlantsQueryHandler.Handle(query);
       return Ok(result);
     }
