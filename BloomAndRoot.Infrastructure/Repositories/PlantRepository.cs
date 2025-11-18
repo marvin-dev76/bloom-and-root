@@ -36,6 +36,7 @@ namespace BloomAndRoot.Infrastructure.Repositories
       var totalCount = await query.CountAsync();
 
       var plants = await query
+        .OrderBy((p) => p.Name)
         .Skip((page - 1) * pageSize)
         .Take(pageSize)
         .ToListAsync();
