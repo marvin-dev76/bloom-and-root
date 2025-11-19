@@ -14,7 +14,7 @@ namespace BloomAndRoot.Application.Features.Plants.Commands.UploadPlantImage
     {
       var plant = await _plantRepository.GetByIdAsync(command.PlantId) ?? throw new NotFoundException($"Plant with Id: {command.PlantId} does not exist");
 
-      if (string.IsNullOrWhiteSpace(plant.ImageURL))
+      if (!string.IsNullOrWhiteSpace(plant.ImageURL))
       {
         await _fileStorageService.DeleteFileAsync(plant.ImageURL);
       }
