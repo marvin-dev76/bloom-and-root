@@ -26,6 +26,10 @@ namespace BloomAndRoot.Infrastructure.Data.Configurations
       builder.Property((p) => p.Stock)
         .IsRequired();
 
+      builder.Property((p) => p.ImageURL)
+        .IsRequired(false)
+        .HasMaxLength(500);
+
       builder.Property((p) => p.CreatedAt)
         .IsRequired();
 

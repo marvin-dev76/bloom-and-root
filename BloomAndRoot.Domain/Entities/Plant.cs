@@ -6,6 +6,7 @@ namespace BloomAndRoot.Domain.Entities
     public string Description { get; set; } = string.Empty;
     public decimal Price { get; set; }
     public int Stock { get; set; }
+    public string ImageURL { get; set; } = string.Empty;
 
     private Plant() { }
 
@@ -57,6 +58,15 @@ namespace BloomAndRoot.Domain.Entities
       if (stock < 0)
         throw new ArgumentException("property stock cannot be negative", nameof(stock));
       Stock = stock;
+      UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void UpdateImageURL(string imageURL)
+    {
+      if (string.IsNullOrWhiteSpace(imageURL))
+        throw new ArgumentException("property imageURL cannot be null or empty", nameof(imageURL));
+
+      ImageURL = imageURL;
       UpdatedAt = DateTime.UtcNow;
     }
 

@@ -1,7 +1,9 @@
 using BloomAndRoot.API.Middleware;
+using BloomAndRoot.API.Services;
 using BloomAndRoot.Application.Features.Plants.Commands.AddPlant;
 using BloomAndRoot.Application.Features.Plants.Commands.DeletePlant;
 using BloomAndRoot.Application.Features.Plants.Commands.UpdatePlant;
+using BloomAndRoot.Application.Features.Plants.Commands.UploadPlantImage;
 using BloomAndRoot.Application.Features.Plants.Queries.GetAllPlants;
 using BloomAndRoot.Application.Features.Plants.Queries.GetPlantById;
 using BloomAndRoot.Application.Interfaces;
@@ -9,6 +11,7 @@ using BloomAndRoot.Infrastructure.Data;
 using BloomAndRoot.Infrastructure.Repositories;
 using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 
 Env.Load();
 
@@ -26,6 +29,8 @@ builder.Services.AddScoped<GetPlantByIdQueryHandler>();
 builder.Services.AddScoped<AddPlantCommandHandler>();
 builder.Services.AddScoped<UpdatePlantCommandHandler>();
 builder.Services.AddScoped<DeletePlantCommandHandler>();
+builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>();
+builder.Services.AddScoped<UploadPlantImageCommandHandler>();
 builder.Services.AddControllers().AddJsonOptions((options) =>
 {
   options.JsonSerializerOptions.NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.Strict;
@@ -33,6 +38,19 @@ builder.Services.AddControllers().AddJsonOptions((options) =>
 
 var app = builder.Build();
 
+string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "uploads");
+
+if (!Directory.Exists(uploadPath))
+{
+  Directory.CreateDirectory(uploadPath);
+}
+
+app.UseStaticFiles();
+app.UseStaticFiles(new StaticFileOptions
+{
+  FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "uploads")),
+  RequestPath = "/uploads"
+});
 app.UseMiddleware<GlobalExceptionMiddleware>();
 app.UseHttpsRedirection();
 app.MapControllers();
