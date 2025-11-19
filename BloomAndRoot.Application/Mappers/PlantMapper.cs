@@ -12,7 +12,7 @@ namespace BloomAndRoot.Application.Mappers
 
     public static PlantDTO ToDTO(this Plant plant)
     {
-      return new PlantDTO { Id = plant.Id, Name = plant.Name, Description = plant.Description, Price = plant.Price, Stock = plant.Stock, CreatedAt = plant.CreatedAt, UpdatedAt = plant.UpdatedAt };
+      return new PlantDTO { Id = plant.Id, Name = plant.Name, Description = plant.Description, Price = plant.Price, Stock = plant.Stock, ImageURL = plant.ImageURL, CreatedAt = plant.CreatedAt, UpdatedAt = plant.UpdatedAt };
     }
   }
 }
