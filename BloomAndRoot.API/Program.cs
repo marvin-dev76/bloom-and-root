@@ -61,6 +61,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>((options) =>
 .AddDefaultTokenProviders();
 builder.Services.AddScoped<IPlantRepository, PlantRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<GetAllPlantsQueryHandler>();
 builder.Services.AddScoped<GetPlantByIdQueryHandler>();
