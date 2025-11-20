@@ -1,3 +1,4 @@
+using System.Text;
 using BloomAndRoot.API.Middleware;
 using BloomAndRoot.API.Services;
 using BloomAndRoot.Application.Features.Plants.Commands.AddPlant;
@@ -9,16 +10,38 @@ using BloomAndRoot.Application.Features.Plants.Queries.GetPlantById;
 using BloomAndRoot.Application.Interfaces;
 using BloomAndRoot.Infrastructure.Data;
 using BloomAndRoot.Infrastructure.Identity;
+using BloomAndRoot.Infrastructure.Interfaces;
 using BloomAndRoot.Infrastructure.Repositories;
+using BloomAndRoot.Infrastructure.Services;
 using DotNetEnv;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.IdentityModel.Tokens;
 
 Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddAuthentication((options) =>
+{
+  options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+  options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer((options) =>
+{
+  options.TokenValidationParameters = new TokenValidationParameters
+  {
+    ValidateIssuer = true,
+    ValidateAudience = true,
+    ValidateLifetime = true,
+    ValidateIssuerSigningKey = true,
+    ValidIssuer = "BloomAndRoot",
+    ValidAudience = "BloomAndRootUsers",
+    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET_KEY")!))
+  };
+});
 builder.Services.AddDbContext<AppDbContext>((options) =>
 {
   var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
@@ -37,6 +60,8 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>((options) =>
 .AddEntityFrameworkStores<AppDbContext>()
 .AddDefaultTokenProviders();
 builder.Services.AddScoped<IPlantRepository, PlantRepository>();
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<GetAllPlantsQueryHandler>();
 builder.Services.AddScoped<GetPlantByIdQueryHandler>();
 builder.Services.AddScoped<AddPlantCommandHandler>();
