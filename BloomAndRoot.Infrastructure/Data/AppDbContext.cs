@@ -9,11 +9,13 @@ namespace BloomAndRoot.Infrastructure.Data
   public class AppDbContext(DbContextOptions options) : IdentityDbContext<ApplicationUser>(options)
   {
     public DbSet<Plant> Plants { get; set; }
+    public DbSet<Customer> Customers { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
       base.OnModelCreating(modelBuilder);
       modelBuilder.ApplyConfiguration(new PlantConfiguration());
+      modelBuilder.ApplyConfiguration(new CustomerConfiguration());
     }
   }
 }
