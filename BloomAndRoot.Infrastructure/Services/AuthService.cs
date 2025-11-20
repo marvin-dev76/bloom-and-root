@@ -1,6 +1,4 @@
-using System.ComponentModel.DataAnnotations;
 using BloomAndRoot.Application.DTOs;
-using BloomAndRoot.Application.Exceptions;
 using BloomAndRoot.Application.Interfaces;
 using BloomAndRoot.Domain.Entities;
 using BloomAndRoot.Infrastructure.Identity;
@@ -25,7 +23,7 @@ namespace BloomAndRoot.Infrastructure.Services
     {
       var existingUser = await _userManager.FindByEmailAsync(dto.Email);
       if (existingUser != null)
-        throw new Application.Exceptions.ValidationException("email already registered");
+        throw new Application.Exceptions.ValidationException("email already registered"); // <- TODO: change ValicationException name
 
       var user = new ApplicationUser // <- ApplicationUser (for authentication only)
       {
@@ -66,9 +64,27 @@ namespace BloomAndRoot.Infrastructure.Services
       };
     }
 
-    public Task<AuthResponseDTO> LoginAsync(LoginDTO dto)
+    public async Task<AuthResponseDTO> LoginAsync(LoginDTO dto)
     {
-      throw new NotImplementedException();
+      var user = await _userManager.FindByEmailAsync(dto.Email) ??
+        throw new Application.Exceptions.ValidationException("email already registered");
+
+      var result = await _signInManager.CheckPasswordSignInAsync(user, dto.Password, false);
+      if (!result.Succeeded)
+        throw new Application.Exceptions.ValidationException("invalid email or password");
+
+      var customer = await _customerRepository.GetByIdAsync(user.Id);
+
+      var roles = await _userManager.GetRolesAsync(user);
+      var token = _tokenService.GenerateToken(user, roles);
+
+      return new AuthResponseDTO
+      {
+        Token = token,
+        Email = user.Email!,
+        FullName = customer?.FullName ?? user.Email!,
+        Roles = roles
+      };
     }
   }
 }

@@ -16,5 +16,12 @@ namespace BloomAndRoot.API.Controllers
       var result = await _authService.RegisterAsync(dto);
       return Ok(result);
     }
+
+    [HttpPost("login")]
+    public async Task<IActionResult> Login([FromBody] LoginDTO dto)
+    {
+      var result = await _authService.LoginAsync(dto);
+      return Ok(result);
+    }
   }
 }
