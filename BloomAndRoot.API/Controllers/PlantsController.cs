@@ -6,6 +6,7 @@ using BloomAndRoot.Application.Features.Plants.Commands.UpdatePlant;
 using BloomAndRoot.Application.Features.Plants.Commands.UploadPlantImage;
 using BloomAndRoot.Application.Features.Plants.Queries.GetAllPlants;
 using BloomAndRoot.Application.Features.Plants.Queries.GetPlantById;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BloomAndRoot.API.Controllers
@@ -54,7 +55,7 @@ namespace BloomAndRoot.API.Controllers
       return Ok(result);
     }
 
-    // GET plant by Id enpoint
+    // GET plant by Id endpoint
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
@@ -64,6 +65,8 @@ namespace BloomAndRoot.API.Controllers
     }
 
     // POST plant endpoint
+    [Authorize (Roles = "Admin")]
+    [HttpPost]
     public async Task<IActionResult> Add([FromBody] AddPlantDTO dto)
     {
       var command = new AddPlantCommand(dto.Name, dto.Description, dto.Price, dto.Stock);
@@ -73,6 +76,7 @@ namespace BloomAndRoot.API.Controllers
 
     // POST plant image
     [HttpPost("{id}/image")]
+    [Authorize (Roles = "Admin")]
     public async Task<IActionResult> UploadImage(int id, IFormFile file)
     {
       if (file == null || file.Length == 0)
@@ -94,6 +98,7 @@ namespace BloomAndRoot.API.Controllers
 
     // PATCH plant endpoint
     [HttpPatch("{id}")]
+    [Authorize (Roles = "Admin")]
     public async Task<IActionResult> Update(int id, [FromBody] UpdatePlantDTO dto)
     {
       var command = new UpdatePlantCommand(id, dto.Name, dto.Description, dto.Price, dto.Stock);

@@ -24,30 +24,15 @@ Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddAuthentication((options) =>
-{
-  options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-  options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer((options) =>
-{
-  options.TokenValidationParameters = new TokenValidationParameters
-  {
-    ValidateIssuer = true,
-    ValidateAudience = true,
-    ValidateLifetime = true,
-    ValidateIssuerSigningKey = true,
-    ValidIssuer = "BloomAndRoot",
-    ValidAudience = "BloomAndRootUsers",
-    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET_KEY")!))
-  };
-});
+// 1. DbContext
 builder.Services.AddDbContext<AppDbContext>((options) =>
 {
   var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
   var serverVersion = ServerVersion.AutoDetect(connectionString);
   options.UseMySql(connectionString, serverVersion);
 });
+
+// 2. Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>((options) =>
 {
   options.Password.RequireDigit = true;
@@ -59,6 +44,31 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>((options) =>
 })
 .AddEntityFrameworkStores<AppDbContext>()
 .AddDefaultTokenProviders();
+
+// 3. JWT Authentication
+builder.Services.AddAuthentication((options) =>
+{
+  options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+  options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+  options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer((options) =>
+{
+  options.TokenValidationParameters = new TokenValidationParameters
+  {
+    ValidateIssuer = true,
+    ValidateAudience = true,
+    ValidateLifetime = true,
+    ValidateIssuerSigningKey = true,
+    ValidIssuer = "BloomAndRoot",
+    ValidAudience = "BloomAndRootUsers",
+    IssuerSigningKey = new SymmetricSecurityKey(
+      Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET_KEY")!)
+    )
+  };
+});
+
+// Repositories and Services
 builder.Services.AddScoped<IPlantRepository, PlantRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -70,6 +80,7 @@ builder.Services.AddScoped<UpdatePlantCommandHandler>();
 builder.Services.AddScoped<DeletePlantCommandHandler>();
 builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>();
 builder.Services.AddScoped<UploadPlantImageCommandHandler>();
+
 builder.Services.AddControllers().AddJsonOptions((options) =>
 {
   options.JsonSerializerOptions.NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.Strict;
@@ -77,29 +88,33 @@ builder.Services.AddControllers().AddJsonOptions((options) =>
 
 var app = builder.Build();
 
+// Seed
 using (var scope = app.Services.CreateScope())
 {
   var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
   var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-
   await IdentitySeeder.SeedRolesAndAdminAsync(userManager, roleManager);
 }
 
+// Uploads
 string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "uploads");
-
 if (!Directory.Exists(uploadPath))
 {
   Directory.CreateDirectory(uploadPath);
 }
 
+// Middleware
 app.UseStaticFiles();
 app.UseStaticFiles(new StaticFileOptions
 {
-  FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "uploads")),
+  FileProvider = new PhysicalFileProvider(uploadPath),
   RequestPath = "/uploads"
 });
-app.UseMiddleware<GlobalExceptionMiddleware>();
+
 app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
+app.UseMiddleware<GlobalExceptionMiddleware>();
 app.MapControllers();
 
 app.Run();
