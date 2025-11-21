@@ -30,6 +30,7 @@ namespace BloomAndRoot.Domain.Entities
       UnitPrice = unitPrice;
       Subtotal = quantity * unitPrice;
       CreatedAt = DateTime.UtcNow;
+      UpdatedAt = DateTime.UtcNow;
     }
   }
 }

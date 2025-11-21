@@ -6,6 +6,7 @@ namespace BloomAndRoot.Domain.Entities
     public string FullName { get; set; } = string.Empty;
     public string Phone { get; set; } = string.Empty;
     public string Address { get; set; } = string.Empty;
+    public ICollection<Order> Orders { get; set; } = []; // <- Relationship with Order entity
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 
