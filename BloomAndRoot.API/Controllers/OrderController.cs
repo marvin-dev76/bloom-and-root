@@ -1,5 +1,4 @@
 using BloomAndRoot.Application.Features.Orders.Queries.GetAllOrders;
-using BloomAndRoot.Application.Features.Plants.Queries.GetAllPlants;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BloomAndRoot.API.Controllers
