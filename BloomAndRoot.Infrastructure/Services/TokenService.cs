@@ -33,7 +33,7 @@ namespace BloomAndRoot.Infrastructure.Services
         issuer: "BloomAndRoot",
         audience: "BloomAndRootUsers",
         claims,
-        expires: DateTime.UtcNow.AddMinutes(2),
+        expires: DateTime.UtcNow.AddMinutes(10),
         signingCredentials: credentials
       );
 

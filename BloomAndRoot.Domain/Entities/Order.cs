@@ -19,14 +19,14 @@ namespace BloomAndRoot.Domain.Entities
         throw new ArgumentException("property customerId cannot be null or empty", nameof(customerId));
       if (string.IsNullOrWhiteSpace(shippingAddress))
         throw new ArgumentException("property shippingAddress cannot be null or empty", nameof(shippingAddress));
-      if (OrderItems.Count == 0)
+      if (!orderItems.Any())
         throw new ArgumentException("Order must have at least one item", nameof(orderItems));
 
       CustomerId = customerId;
-      TotalAmount = CalculateTotal();
       Status = OrderStatus.Pending;
       ShippingAddress = shippingAddress;
       OrderItems = [.. orderItems];
+      TotalAmount = CalculateTotal();
       CreatedAt = DateTime.UtcNow;
       UpdatedAt = DateTime.UtcNow;
     }

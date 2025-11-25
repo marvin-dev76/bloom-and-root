@@ -11,7 +11,7 @@ namespace BloomAndRoot.Application.Mappers
       {
         Id = order.Id,
         CustomerId = order.CustomerId,
-        CustomerName = order.Customer.FullName,
+        CustomerName = order.Customer?.FullName ?? string.Empty,
         TotalAmount = order.TotalAmount,
         Status = order.Status.ToString(),
         ShippingAddress = order.ShippingAddress,

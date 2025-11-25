@@ -6,10 +6,11 @@ using BloomAndRoot.Domain.Entities;
 
 namespace BloomAndRoot.Application.Features.Orders.Commands.CreateOrder
 {
-  public class CreateOrderCommandHandler(IPlantRepository plantRepository, IOrderRepository orderRepository)
+  public class CreateOrderCommandHandler(IPlantRepository plantRepository, IOrderRepository orderRepository, ICustomerRepository customerRepository)
   {
     private readonly IPlantRepository _plantRepository = plantRepository;
     private readonly IOrderRepository _orderRepository = orderRepository;
+    private readonly ICustomerRepository _customerRepository = customerRepository;
 
     public async Task<OrderDTO> Handle(CreateOrderCommand command)
     {
@@ -32,7 +33,15 @@ namespace BloomAndRoot.Application.Features.Orders.Commands.CreateOrder
         orderItems.Add(orderItem);
       }
 
-      var order = new Order(command.CustomerId, command.ShippingAddress, orderItems);
+      var order = new Order(
+        command.CustomerId,
+        command.ShippingAddress.Trim(),
+        orderItems
+      );
+
+      var customer = await _customerRepository.GetByIdAsync(command.CustomerId)
+        ?? throw new NotFoundException($"customer with Id: {command.CustomerId} does not exist");
+      order.Customer = customer;
 
       await _orderRepository.AddAsync(order);
       await _orderRepository.SaveChangesAsync(); // <- saved all changed made, create orderItems list and new order + plant's stock reduction
