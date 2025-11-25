@@ -1,5 +1,3 @@
-using BloomAndRoot.Domain.Entities;
-
 namespace BloomAndRoot.Application.DTOs
 {
   public class OrderDTO

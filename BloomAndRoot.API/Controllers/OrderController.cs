@@ -1,6 +1,8 @@
 using System.Security.Claims;
 using BloomAndRoot.Application.DTOs;
+using BloomAndRoot.Application.Features.Orders.Commands.CancelOrder;
 using BloomAndRoot.Application.Features.Orders.Commands.CreateOrder;
+using BloomAndRoot.Application.Features.Orders.Commands.UpdateOrderStatus;
 using BloomAndRoot.Application.Features.Orders.Queries.GetAllOrders;
 using BloomAndRoot.Application.Features.Orders.Queries.GetMyOrders;
 using BloomAndRoot.Application.Features.Orders.Queries.GetOrderById;
@@ -15,12 +17,16 @@ namespace BloomAndRoot.API.Controllers
     GetAllOrdersQueryHandler getAllOrdersQueryHandler,
     GetOrderByIdQueryHandler getOrderByIdQueryHandler,
     GetMyOrdersQueryHandler getMyOrdersQueryHandler,
-    CreateOrderCommandHandler createOrderCommandHandler) : ControllerBase
+    CreateOrderCommandHandler createOrderCommandHandler,
+    UpdateOrderStatusCommandHandler updateOrderStatusCommandHandler,
+    CancelOrderCommandHandler cancelOrderCommandHandler) : ControllerBase
   {
     private readonly GetAllOrdersQueryHandler _getAllOrdersQueryHandler = getAllOrdersQueryHandler;
     private readonly GetOrderByIdQueryHandler _getOrderByIdQueryHandler = getOrderByIdQueryHandler;
     private readonly GetMyOrdersQueryHandler _getMyOrdersQueryHandler = getMyOrdersQueryHandler;
     private readonly CreateOrderCommandHandler _createOrderCommandHandler = createOrderCommandHandler;
+    private readonly UpdateOrderStatusCommandHandler _updateOrderStatusCommandHandler = updateOrderStatusCommandHandler;
+    private readonly CancelOrderCommandHandler _cancelOrderCommandHandler = cancelOrderCommandHandler;
 
     // GET All orders endpoint (just an admin can see all the others from all the customers)
     [HttpGet]
@@ -50,7 +56,6 @@ namespace BloomAndRoot.API.Controllers
     }
 
     // GET My orders endpoint (customers can get their own orders paged)
-
     [HttpGet("my-orders")]
     public async Task<IActionResult> GetMyOrders([FromQuery] int page = 1, [FromQuery] int pageSize = 15)
     {
@@ -86,6 +91,34 @@ namespace BloomAndRoot.API.Controllers
       };
 
       var result = await _createOrderCommandHandler.Handle(command);
+      return Ok(result);
+    }
+
+    // PUT update order status (only admin can update the order status)
+    [HttpPut("{id}/status")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> UpdateStatus(int id, [FromBody] UpdateOrderStatusDTO dto)
+    {
+      var command = new UpdateOrderStatusCommand(id, dto.Status);
+      var result = await _updateOrderStatusCommandHandler.Handle(command);
+
+      return Ok(result);
+    }
+
+    // PUT cancel order endpoint
+    [HttpPut("{id}/cancel")]
+    [Authorize]
+    public async Task<IActionResult> Cancel(int id)
+    {
+      var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+      var isAdmin = User.IsInRole("Admin");
+
+      if (string.IsNullOrWhiteSpace(userId))
+        return Unauthorized(new { error = "user not authenticated" });
+
+      var command = new CancelOrderCommand(id, userId, isAdmin);
+      var result = await _cancelOrderCommandHandler.Handle(command);
+
       return Ok(result);
     }
   }

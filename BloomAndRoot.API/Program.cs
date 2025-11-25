@@ -1,7 +1,9 @@
 using System.Text;
 using BloomAndRoot.API.Middleware;
 using BloomAndRoot.API.Services;
+using BloomAndRoot.Application.Features.Orders.Commands.CancelOrder;
 using BloomAndRoot.Application.Features.Orders.Commands.CreateOrder;
+using BloomAndRoot.Application.Features.Orders.Commands.UpdateOrderStatus;
 using BloomAndRoot.Application.Features.Orders.Queries.GetAllOrders;
 using BloomAndRoot.Application.Features.Orders.Queries.GetMyOrders;
 using BloomAndRoot.Application.Features.Orders.Queries.GetOrderById;
@@ -89,6 +91,8 @@ builder.Services.AddScoped<GetAllOrdersQueryHandler>();
 builder.Services.AddScoped<GetOrderByIdQueryHandler>();
 builder.Services.AddScoped<GetMyOrdersQueryHandler>();
 builder.Services.AddScoped<CreateOrderCommandHandler>();
+builder.Services.AddScoped<UpdateOrderStatusCommandHandler>();
+builder.Services.AddScoped<CancelOrderCommandHandler>();
 
 builder.Services.AddControllers().AddJsonOptions((options) =>
 {
