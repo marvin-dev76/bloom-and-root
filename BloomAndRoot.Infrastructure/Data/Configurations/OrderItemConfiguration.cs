@@ -14,7 +14,7 @@ namespace BloomAndRoot.Infrastructure.Data.Configurations
       builder.HasOne((oi) => oi.Plant)
         .WithMany()
         .HasForeignKey((oi) => oi.PlantId)
-        .OnDelete(DeleteBehavior.Cascade);
+        .OnDelete(DeleteBehavior.Restrict);
       
       builder.Property((oi) => oi.PlantName)
         .HasMaxLength(100)

@@ -2,6 +2,7 @@ using System.Security.Claims;
 using BloomAndRoot.Application.DTOs;
 using BloomAndRoot.Application.Features.Orders.Commands.CancelOrder;
 using BloomAndRoot.Application.Features.Orders.Commands.CreateOrder;
+using BloomAndRoot.Application.Features.Orders.Commands.DeleteOrder;
 using BloomAndRoot.Application.Features.Orders.Commands.UpdateOrderStatus;
 using BloomAndRoot.Application.Features.Orders.Queries.GetAllOrders;
 using BloomAndRoot.Application.Features.Orders.Queries.GetMyOrders;
@@ -19,7 +20,8 @@ namespace BloomAndRoot.API.Controllers
     GetMyOrdersQueryHandler getMyOrdersQueryHandler,
     CreateOrderCommandHandler createOrderCommandHandler,
     UpdateOrderStatusCommandHandler updateOrderStatusCommandHandler,
-    CancelOrderCommandHandler cancelOrderCommandHandler) : ControllerBase
+    CancelOrderCommandHandler cancelOrderCommandHandler,
+    DeleteOrderCommandHandler deleteOrderCommandHandler) : ControllerBase
   {
     private readonly GetAllOrdersQueryHandler _getAllOrdersQueryHandler = getAllOrdersQueryHandler;
     private readonly GetOrderByIdQueryHandler _getOrderByIdQueryHandler = getOrderByIdQueryHandler;
@@ -27,6 +29,7 @@ namespace BloomAndRoot.API.Controllers
     private readonly CreateOrderCommandHandler _createOrderCommandHandler = createOrderCommandHandler;
     private readonly UpdateOrderStatusCommandHandler _updateOrderStatusCommandHandler = updateOrderStatusCommandHandler;
     private readonly CancelOrderCommandHandler _cancelOrderCommandHandler = cancelOrderCommandHandler;
+    private readonly DeleteOrderCommandHandler _deleteOrderCommandHandler = deleteOrderCommandHandler;
 
     // GET All orders endpoint (just an admin can see all the others from all the customers)
     [HttpGet]
@@ -120,6 +123,16 @@ namespace BloomAndRoot.API.Controllers
       var result = await _cancelOrderCommandHandler.Handle(command);
 
       return Ok(result);
+    }
+
+    // DELETE order endpoint (only admin can delete orders, just for now)
+    [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> Delete(int id)
+    {
+      var command = new DeleteOrderCommand(id);
+      await _deleteOrderCommandHandler.Handle(command);
+      return NoContent();
     }
   }
 }

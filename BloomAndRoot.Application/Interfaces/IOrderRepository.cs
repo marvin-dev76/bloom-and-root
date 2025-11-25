@@ -12,7 +12,7 @@ namespace BloomAndRoot.Application.Interfaces
     // Commands
     Task AddAsync(Order order);
     void Update(Order order);
-    void DeleteAsync(Order order);
+    void Delete(Order order);
 
     // Persistance
     Task SaveChangesAsync();

@@ -14,7 +14,7 @@ namespace BloomAndRoot.Infrastructure.Repositories
       await _appDbContext.Orders.AddAsync(order);
     }
 
-    public void DeleteAsync(Order order)
+    public void Delete(Order order)
     {
       _appDbContext.Orders.Remove(order);
     }
