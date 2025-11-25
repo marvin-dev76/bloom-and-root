@@ -33,10 +33,10 @@ namespace BloomAndRoot.API.Middleware
         context.Response.StatusCode = 400;
         await context.Response.WriteAsJsonAsync(new { message = "Invalid Request Format" });
       }
-      catch (Exception)
+      catch (Exception ex)
       {
         context.Response.StatusCode = 500;
-        await context.Response.WriteAsJsonAsync(new { message = "Internal Server Error" });
+        await context.Response.WriteAsJsonAsync(new { message = $"Internal Server Error: {ex.Message}" });
       }
     }
   }

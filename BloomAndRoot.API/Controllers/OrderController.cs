@@ -2,6 +2,7 @@ using System.Security.Claims;
 using BloomAndRoot.Application.DTOs;
 using BloomAndRoot.Application.Features.Orders.Commands.CreateOrder;
 using BloomAndRoot.Application.Features.Orders.Queries.GetAllOrders;
+using BloomAndRoot.Application.Features.Orders.Queries.GetOrderById;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,11 +12,14 @@ namespace BloomAndRoot.API.Controllers
   [Route("api/orders")]
   public class OrderController(
     GetAllOrdersQueryHandler getAllOrdersQueryHandler,
+    GetOrderByIdQueryHandler getOrderByIdQueryHandler,
     CreateOrderCommandHandler createOrderCommandHandler) : ControllerBase
   {
     private readonly GetAllOrdersQueryHandler _getAllOrdersQueryHandler = getAllOrdersQueryHandler;
+    private readonly GetOrderByIdQueryHandler _getOrderByIdQueryHandler = getOrderByIdQueryHandler;
     private readonly CreateOrderCommandHandler _createOrderCommandHandler = createOrderCommandHandler;
 
+    // GET All orders endpoint (just an admin can see all the others from all the customers)
     [HttpGet]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 15)
@@ -25,6 +29,24 @@ namespace BloomAndRoot.API.Controllers
       return Ok(result);
     }
 
+    // GET Order by Id endpoint (only an admin can see any order by Id, customers can see their own orders)
+    [HttpGet("{id}")]
+    public async Task<ActionResult> GetById(int id)
+    {
+      var query = new GetOrderByIdQuery(id);
+      var result = await _getOrderByIdQueryHandler.Handle(query);
+
+      var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+      if (!User.IsInRole("Admin") && userId != result.CustomerId)
+      {
+        return Forbid();
+      }
+
+      return Ok(result);
+    }
+
+    // POST Order endpoint
     [HttpPost]
     [Authorize(Roles = "Customer")]
     public async Task<IActionResult> Add([FromBody] CreateOrderDTO dto)
