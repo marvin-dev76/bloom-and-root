@@ -2,6 +2,7 @@ using System.Security.Claims;
 using BloomAndRoot.Application.DTOs;
 using BloomAndRoot.Application.Features.Orders.Commands.CreateOrder;
 using BloomAndRoot.Application.Features.Orders.Queries.GetAllOrders;
+using BloomAndRoot.Application.Features.Orders.Queries.GetMyOrders;
 using BloomAndRoot.Application.Features.Orders.Queries.GetOrderById;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,10 +14,12 @@ namespace BloomAndRoot.API.Controllers
   public class OrderController(
     GetAllOrdersQueryHandler getAllOrdersQueryHandler,
     GetOrderByIdQueryHandler getOrderByIdQueryHandler,
+    GetMyOrdersQueryHandler getMyOrdersQueryHandler,
     CreateOrderCommandHandler createOrderCommandHandler) : ControllerBase
   {
     private readonly GetAllOrdersQueryHandler _getAllOrdersQueryHandler = getAllOrdersQueryHandler;
     private readonly GetOrderByIdQueryHandler _getOrderByIdQueryHandler = getOrderByIdQueryHandler;
+    private readonly GetMyOrdersQueryHandler _getMyOrdersQueryHandler = getMyOrdersQueryHandler;
     private readonly CreateOrderCommandHandler _createOrderCommandHandler = createOrderCommandHandler;
 
     // GET All orders endpoint (just an admin can see all the others from all the customers)
@@ -42,6 +45,22 @@ namespace BloomAndRoot.API.Controllers
       {
         return Forbid();
       }
+
+      return Ok(result);
+    }
+
+    // GET My orders endpoint (customers can get their own orders paged)
+
+    [HttpGet("my-orders")]
+    public async Task<IActionResult> GetMyOrders([FromQuery] int page = 1, [FromQuery] int pageSize = 15)
+    {
+      var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+      if (string.IsNullOrWhiteSpace(userId))
+        return Unauthorized(new { error = "user not authenticated" });
+
+      var query = new GetMyOrdersQuery(userId, page, pageSize);
+      var result = await _getMyOrdersQueryHandler.Handle(query);
 
       return Ok(result);
     }

@@ -3,6 +3,7 @@ using BloomAndRoot.API.Middleware;
 using BloomAndRoot.API.Services;
 using BloomAndRoot.Application.Features.Orders.Commands.CreateOrder;
 using BloomAndRoot.Application.Features.Orders.Queries.GetAllOrders;
+using BloomAndRoot.Application.Features.Orders.Queries.GetMyOrders;
 using BloomAndRoot.Application.Features.Orders.Queries.GetOrderById;
 using BloomAndRoot.Application.Features.Plants.Commands.AddPlant;
 using BloomAndRoot.Application.Features.Plants.Commands.DeletePlant;
@@ -86,6 +87,7 @@ builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>();
 builder.Services.AddScoped<UploadPlantImageCommandHandler>();
 builder.Services.AddScoped<GetAllOrdersQueryHandler>();
 builder.Services.AddScoped<GetOrderByIdQueryHandler>();
+builder.Services.AddScoped<GetMyOrdersQueryHandler>();
 builder.Services.AddScoped<CreateOrderCommandHandler>();
 
 builder.Services.AddControllers().AddJsonOptions((options) =>
