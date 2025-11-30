@@ -10,6 +10,7 @@ namespace BloomAndRoot.Domain.Entities
     public string ShippingAddress { get; set; } = string.Empty;
     public Customer Customer { get; set; } = null!; // <- Navigation property
     public ICollection<OrderItem> OrderItems { get; set; } = [];
+    public Payment? Payment { get; set; }
 
     private Order() { }
 
@@ -42,7 +43,7 @@ namespace BloomAndRoot.Domain.Entities
         throw new InvalidOperationException("cannot update a cancelled order");
       if (Status == OrderStatus.Delivered)
         throw new InvalidOperationException("cannot update a delivered order");
-      
+
       Status = newStatus;
       UpdatedAt = DateTime.UtcNow;
     }
@@ -53,8 +54,17 @@ namespace BloomAndRoot.Domain.Entities
         throw new InvalidOperationException("cannot cancel a cancelled order");
       if (Status == OrderStatus.Delivered)
         throw new InvalidOperationException("cannot cancel a delivered order");
-      
+
       Status = OrderStatus.Cancelled;
+      UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void MarkAsPaid()
+    {
+      if (Status != OrderStatus.Pending)
+        throw new InvalidOperationException($"cannot mark order as paid, current status {Status}");
+      
+      Status = OrderStatus.Paid;
       UpdatedAt = DateTime.UtcNow;
     }
   }

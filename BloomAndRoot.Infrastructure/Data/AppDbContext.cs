@@ -20,6 +20,7 @@ namespace BloomAndRoot.Infrastructure.Data
       modelBuilder.ApplyConfiguration(new CustomerConfiguration());
       modelBuilder.ApplyConfiguration(new OrderConfiguration());
       modelBuilder.ApplyConfiguration(new OrderItemConfiguration());
+      modelBuilder.ApplyConfiguration(new PaymentConfiguration());
     }
   }
 }
