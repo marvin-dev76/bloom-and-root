@@ -82,6 +82,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<GetAllPlantsQueryHandler>();
 builder.Services.AddScoped<GetPlantByIdQueryHandler>();
 builder.Services.AddScoped<AddPlantCommandHandler>();
